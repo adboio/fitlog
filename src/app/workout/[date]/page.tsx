@@ -5,13 +5,15 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import type { PostgrestError } from '@supabase/supabase-js';
 
 type Params = Promise<{ date: string }>
 
+type Workout = { title: string; description: string };
 
 export default function WorkoutPageWrapper(props: { params: Params }) {
-  const [data, setData] = useState<any[]>([]);
-  const [error, setError] = useState<any>(null);
+  const [data, setData] = useState<Workout[]>([]);
+  const [error, setError] = useState<PostgrestError | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [date, setDate] = useState<string>("");
