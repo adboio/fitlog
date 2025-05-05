@@ -205,6 +205,7 @@ export default function Home() {
             {/* Workout Heatmap */}
             <div className="flex-1">
               <h3 className="text-xl font-semibold mb-2 text-center">Workout Days</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">click 🟩 to view workout</p>
               {workoutLoading ? (
                 <div className="text-center text-gray-500">Loading...</div>
               ) : (
