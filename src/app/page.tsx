@@ -209,23 +209,25 @@ export default function Home() {
               {workoutLoading ? (
                 <div className="text-center text-gray-500">Loading...</div>
               ) : (
-                <CalendarHeatmap
-                  startDate={startDate}
-                  endDate={endDate}
-                  values={heatmapValues}
-                  classForValue={(value: { date: string; count: number; title?: string; description?: string } | undefined) => {
-                    if (!value || value.count === 0) {
-                      return "color-empty";
-                    }
-                    return "color-filled";
-                  }}
-                  showWeekdayLabels={true}
-                  onClick={(value: { date: string; count: number; title?: string; description?: string } | undefined) => {
-                    if (value && value.date) {
-                      router.push(`/workout/${value.date}`);
-                    }
-                  }}
-                />
+                <div className="overflow-x-auto">
+                  <CalendarHeatmap
+                    startDate={startDate}
+                    endDate={endDate}
+                    values={heatmapValues}
+                    classForValue={(value: { date: string; count: number; title?: string; description?: string } | undefined) => {
+                      if (!value || value.count === 0) {
+                        return "color-empty";
+                      }
+                      return "color-filled";
+                    }}
+                    showWeekdayLabels={true}
+                    onClick={(value: { date: string; count: number; title?: string; description?: string } | undefined) => {
+                      if (value && value.date) {
+                        router.push(`/workout/${value.date}`);
+                      }
+                    }}
+                  />
+                </div>
               )}
             </div>
           </div>

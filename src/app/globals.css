@@ -143,3 +143,10 @@ ol ol, ul ul, ol ul, ul ol {
 .color-filled:hover {
   cursor: pointer;
 }
+
+@media (max-width: 640px) {
+  .react-calendar-heatmap-month-label,
+  .react-calendar-heatmap-weekday-label {
+    font-size: 8px !important;
+  }
+}
