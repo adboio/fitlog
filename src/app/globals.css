@@ -121,10 +121,10 @@
   }
 }
 
-ol, ul {
+.workout ol, .workout ul {
   list-style: revert !important;
 }
-li {
+.workoutli {
   display: list-item !important;
   list-style-type: inherit !important;
 }
@@ -134,7 +134,7 @@ li {
   padding-left: 2em !important;
 } */
 
-ol ol, ul ul, ol ul, ul ol {
+.workout ol ol, .workout ul ul, .workout ol ul, .workout ul ol {
   margin-left: 2em !important;
   padding-left: 2em !important;
 }
