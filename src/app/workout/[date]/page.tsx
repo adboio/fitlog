@@ -6,7 +6,8 @@ interface WorkoutPageProps {
   params: { date: string };
 }
 
-export default async function WorkoutPage({ params }: WorkoutPageProps) {
+export default async function WorkoutPage(props: WorkoutPageProps) {
+  const { params } = await props;
   const { date } = params;
   const { data, error } = await supabase
     .from("workouts")
