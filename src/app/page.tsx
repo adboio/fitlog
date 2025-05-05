@@ -150,13 +150,6 @@ export default function Home() {
   const latestEntry = sortedFood.find(f => f.calories && f.calories !== 0);
   const latestDateStr = latestEntry?.date ?? '';
 
-  // Get current date in PT
-  function getTodayPT() {
-    const now = new Date();
-    const pt = now.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
-    return pt;
-  }
-  const todayPT = getTodayPT();
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
@@ -176,6 +169,16 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center p-8 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-white dark:bg-black">
+      <div className="w-full flex justify-start">
+        <a
+          href="https://adboio.fit"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mb-4 px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+        >
+          ← Back to adboio.fit
+        </a>
+      </div>
       <main className="flex flex-col gap-8 items-center max-w-4xl w-full">
         <div className="flex flex-col gap-2 items-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-center">adboio.fit/log</h1>

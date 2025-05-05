@@ -138,3 +138,8 @@ ol ol, ul ul, ol ul, ul ol {
   margin-left: 2em !important;
   padding-left: 2em !important;
 }
+
+/* Make heatmap cells show pointer cursor on hover */
+.color-filled:hover {
+  cursor: pointer;
+}
