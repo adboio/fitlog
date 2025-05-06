@@ -197,7 +197,7 @@ export default function Home() {
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="weight" stroke="#6366f1" dot={false} />
+                    <Line type="monotone" dataKey="weight" stroke="#6366f1" dot={true} />
                   </LineChart>
                 </ChartContainer>
               )}
