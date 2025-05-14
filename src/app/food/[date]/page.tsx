@@ -6,10 +6,11 @@ import remarkGfm from "remark-gfm";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { PostgrestError } from '@supabase/supabase-js';
+import { MacroProgressSection } from "@/components/ui/MacroProgressSection";
 
 type Params = Promise<{ date: string }>
 
-type FoodEntry = { description: string };
+type FoodEntry = { description: string; calories: number; protein: number; carbs: number; fat: number };
 
 export default function FoodLogPage(props: { params: Params }) {
   const [data, setData] = useState<FoodEntry | null>(null);
@@ -24,7 +25,7 @@ export default function FoodLogPage(props: { params: Params }) {
       setDate(params.date);
       const { data, error } = await supabase
         .from("food")
-        .select("description")
+        .select("description, calories, protein, carbs, fat")
         .eq("date", params.date)
         .single();
       setData(data || null);
@@ -38,6 +39,13 @@ export default function FoodLogPage(props: { params: Params }) {
     return <div className="p-8 max-w-xl mx-auto">No food log found</div>;
   }
 
+  const macroTargets = {
+    calories: 2361,
+    protein: 225,
+    carbs: 201,
+    fat: 73,
+  };
+
   return (
     <div className="p-8 max-w-xl mx-auto food-log workout">
       <button
@@ -50,6 +58,7 @@ export default function FoodLogPage(props: { params: Params }) {
       <div className="prose dark:prose-invert">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.description}</ReactMarkdown>
       </div>
+      <MacroProgressSection entry={data} className="mb-8" />
     </div>
   );
 } 

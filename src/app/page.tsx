@@ -7,6 +7,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import { useRouter } from "next/navigation";
+import { MacroProgressSection } from "@/components/ui/MacroProgressSection";
 
 // Explicit type for weight data
 interface WeightEntry {
@@ -28,28 +29,6 @@ interface FoodEntry {
   carbs: number;
   fat: number;
   description?: string;
-}
-
-// Simple macro progress bar component
-function MacroProgress({ label, value, target, color }: { label: string; value: number; target: number; color: string }) {
-  const percent = Math.min((value / target) * 100, 100);
-  const overTarget = value > target;
-  const barColor = overTarget ? '#ef4444' : color; // Tailwind red-500
-  const labelColor = overTarget ? 'text-red-700' : '';
-  return (
-    <div className="flex flex-col gap-1">
-      <div className={`flex justify-between text-xs font-medium ${labelColor}`}>
-        <span>{label}</span>
-        <span>{value} / {target}</span>
-      </div>
-      <div className="w-full h-3 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-        <div
-          className="h-3 rounded-full transition-all duration-300"
-          style={{ width: `${percent}%`, backgroundColor: barColor }}
-        />
-      </div>
-    </div>
-  );
 }
 
 export default function Home() {
@@ -257,12 +236,7 @@ export default function Home() {
                   )}
                 </div>
                 {latestEntry ? (
-                  <>
-                    <MacroProgress label="Calories" value={latestEntry.calories} target={macroTargets.calories} color="#f59e42" />
-                    <MacroProgress label="Protein" value={latestEntry.protein} target={macroTargets.protein} color="#60a5fa" />
-                    <MacroProgress label="Carbs" value={latestEntry.carbs} target={macroTargets.carbs} color="#34d399" />
-                    <MacroProgress label="Fat" value={latestEntry.fat} target={macroTargets.fat} color="#f472b6" />
-                  </>
+                  <MacroProgressSection entry={latestEntry} />
                 ) : (
                   <div className="text-center text-gray-400">No food entries found</div>
                 )}
