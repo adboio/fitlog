@@ -39,13 +39,6 @@ export default function FoodLogPage(props: { params: Params }) {
     return <div className="p-8 max-w-xl mx-auto">No food log found</div>;
   }
 
-  const macroTargets = {
-    calories: 2361,
-    protein: 225,
-    carbs: 201,
-    fat: 73,
-  };
-
   return (
     <div className="p-8 max-w-xl mx-auto food-log workout">
       <button

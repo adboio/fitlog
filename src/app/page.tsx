@@ -115,13 +115,6 @@ export default function Home() {
   const startDate = new Date();
   startDate.setMonth(endDate.getMonth() - 3);
 
-  // Macro targets
-  const macroTargets = {
-    calories: 2361,
-    protein: 225,
-    carbs: 201,
-    fat: 73,
-  };
 
   // Find the latest entry with non-zero calories
   const sortedFood = [...foodData]
