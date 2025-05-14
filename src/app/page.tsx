@@ -188,6 +188,7 @@ export default function Home() {
             {/* Weight Chart */}
             <div className="flex-1">
               <h3 className="text-xl font-semibold mb-2 text-center">Weight</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">current target: 225 lb</p>
               {loading ? (
                 <div className="text-center text-gray-500">Loading...</div>
               ) : (
@@ -240,7 +241,21 @@ export default function Home() {
             <div className="flex flex-col gap-4">
               {/* Progress bars for today */}
               <div className="flex flex-col gap-2 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                <div className="font-medium text-center mb-2">Latest Entry{latestDateStr ? ` (${latestDateStr})` : ''}</div>
+                <div className="font-medium text-center mb-2 flex items-center justify-center gap-2">
+                  <span>Latest Entry{latestDateStr ? ` (${latestDateStr})` : ''}</span>
+                  {latestEntry && (
+                    <button
+                      type="button"
+                      aria-label="View food log for this day"
+                      onClick={() => router.push(`/food/${latestEntry.date}`)}
+                      className="ml-1 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors hover:cursor-pointer"
+                    >
+                      <svg fill="none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 inline-block align-middle">
+                        <path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z" clipRule="evenodd" fill="#666" fillRule="evenodd"/>
+                      </svg>
+                    </button>
+                  )}
+                </div>
                 {latestEntry ? (
                   <>
                     <MacroProgress label="Calories" value={latestEntry.calories} target={macroTargets.calories} color="#f59e42" />
@@ -272,6 +287,39 @@ export default function Home() {
                     <Line type="monotone" dataKey="fat" stroke="#f472b6" dot={false} />
                   </LineChart>
                 </ChartContainer>
+              </div>
+              {/* Last 10 food entries table */}
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mt-4">
+                <div className="font-medium text-center mb-2">Last 10 Food Entries</div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">click a row to view what i ate that day</p>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-xs text-gray-500 dark:text-gray-400">
+                        <th className="py-1 px-2 font-semibold">Date</th>
+                        <th className="py-1 px-2 font-semibold">Calories</th>
+                        <th className="py-1 px-2 font-semibold">Protein</th>
+                        <th className="py-1 px-2 font-semibold">Carbs</th>
+                        <th className="py-1 px-2 font-semibold">Fat</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedFood.slice(0, 10).map(entry => (
+                        <tr
+                          key={entry.date}
+                          className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                          onClick={() => router.push(`/food/${entry.date}`)}
+                        >
+                          <td className="py-1 px-2 font-mono">{entry.date}</td>
+                          <td className="py-1 px-2">{entry.calories}</td>
+                          <td className="py-1 px-2">{entry.protein}</td>
+                          <td className="py-1 px-2">{entry.carbs}</td>
+                          <td className="py-1 px-2">{entry.fat}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
