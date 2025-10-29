@@ -9,6 +9,62 @@ import 'react-calendar-heatmap/dist/styles.css';
 import { useRouter } from "next/navigation";
 import { MacroProgressSection } from "@/components/ui/MacroProgressSection";
 
+// Macro goals (matching MacroProgressSection)
+const macroTargets = {
+  calories: 2361,
+  protein: 225,
+  carbs: 201,
+  fat: 73,
+};
+
+// Utility function to calculate goal achievement score (0-100)
+function calculateGoalScore(value: number, target: number, isHigherBetter: boolean): number {
+  if (isHigherBetter) {
+    // For protein: higher is better, score = (value / target) * 100, capped at 100
+    return Math.min((value / target) * 100, 100);
+  } else {
+    // For calories/carbs/fat: lower is better
+    if (value === 0) return 100; // 0 is perfect for "lower is better"
+    if (value <= target) {
+      // At or under target = perfect score
+      return 100;
+    } else {
+      // Over target = penalty based on how much over
+      // Score decreases as you go further over target
+      const excessRatio = value / target;
+      return Math.max(100 - ((excessRatio - 1) * 100), 0);
+    }
+  }
+}
+
+// Utility function to get background color for individual macro cells
+function getMacroCellColor(value: number, target: number, isHigherBetter: boolean): string {
+  // Special case: zero values should always be red (missing data)
+  if (value === 0) {
+    return `rgba(239, 68, 68, 0.4)`; // red-500 with higher opacity for missing data
+  }
+  
+  const score = calculateGoalScore(value, target, isHigherBetter);
+  
+  // Map score to color: 0-40 = red, 40-70 = yellow, 70-100 = green
+  if (score >= 70) {
+    // Green range: scale from light green to darker green
+    const intensity = Math.min((score - 70) / 30, 1);
+    const opacity = 0.15 + (intensity * 0.25); // 0.15 to 0.4 opacity
+    return `rgba(34, 197, 94, ${opacity})`; // green-500
+  } else if (score >= 40) {
+    // Yellow range: scale from light yellow to darker yellow
+    const intensity = (score - 40) / 30;
+    const opacity = 0.15 + (intensity * 0.25); // 0.15 to 0.4 opacity
+    return `rgba(234, 179, 8, ${opacity})`; // yellow-500
+  } else {
+    // Red range: scale from light red to darker red
+    const intensity = score / 40;
+    const opacity = 0.15 + (intensity * 0.25); // 0.15 to 0.4 opacity
+    return `rgba(239, 68, 68, ${opacity})`; // red-500
+  }
+}
+
 // Explicit type for weight data
 interface WeightEntry {
   date: string;
@@ -122,6 +178,7 @@ export default function Home() {
   const latestEntry = sortedFood.find(f => f.calories && f.calories !== 0);
   const latestDateStr = latestEntry?.date ?? '';
 
+  // Chart data: last 7 days
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
@@ -129,6 +186,24 @@ export default function Home() {
     return d.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
   });
   const trendData = last7Days.map(date => {
+    const entry = foodData.find(f => f.date === date);
+    return {
+      date,
+      calories: entry?.calories ?? 0,
+      protein: entry?.protein ?? 0,
+      carbs: entry?.carbs ?? 0,
+      fat: entry?.fat ?? 0,
+    };
+  });
+
+  // Table data: last 10 calendar dates with gaps filled as zeros (most recent first)
+  const last10CalendarDays = Array.from({ length: 10 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    return d.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+  });
+  
+  const tableData = last10CalendarDays.map(date => {
     const entry = foodData.find(f => f.date === date);
     return {
       date,
@@ -167,7 +242,7 @@ export default function Home() {
                 <ChartContainer config={{ weight: { label: "Weight", color: "#6366f1" } }}>
                   <LineChart data={weightData} width={400} height={250} margin={{ top: 16, right: 16, left: 0, bottom: 16 }}>
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} domain={[190, 270]} />
                     <Tooltip />
                     <Legend />
                     <Line type="monotone" dataKey="weight" stroke="#6366f1" dot={true} />
@@ -260,28 +335,48 @@ export default function Home() {
                 <div className="font-medium text-center mb-2">Last 10 Food Entries</div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-2">click a row to view what i ate that day</p>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
+                  <table className="min-w-full text-sm table-fixed">
                     <thead>
                       <tr className="text-left text-xs text-gray-500 dark:text-gray-400">
-                        <th className="py-1 px-2 font-semibold">Date</th>
-                        <th className="py-1 px-2 font-semibold">Calories</th>
-                        <th className="py-1 px-2 font-semibold">Protein</th>
-                        <th className="py-1 px-2 font-semibold">Carbs</th>
-                        <th className="py-1 px-2 font-semibold">Fat</th>
+                        <th className="py-1 px-2 font-semibold w-1/5 sm:w-1/5">Date</th>
+                        <th className="py-1 px-2 font-semibold w-1/5">Calories</th>
+                        <th className="py-1 px-2 font-semibold w-1/5">Protein</th>
+                        <th className="py-1 px-2 font-semibold w-1/5">Carbs</th>
+                        <th className="py-1 px-2 font-semibold w-1/5">Fat</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedFood.slice(0, 10).map(entry => (
+                      {tableData.map(entry => (
                         <tr
                           key={entry.date}
-                          className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                          className="transition-colors cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
                           onClick={() => router.push(`/food/${entry.date}`)}
                         >
-                          <td className="py-1 px-2 font-mono">{entry.date}</td>
-                          <td className="py-1 px-2">{entry.calories}</td>
-                          <td className="py-1 px-2">{entry.protein}</td>
-                          <td className="py-1 px-2">{entry.carbs}</td>
-                          <td className="py-1 px-2">{entry.fat}</td>
+                          <td className="py-1 px-2 font-mono w-1/5 whitespace-nowrap">{entry.date}</td>
+                          <td 
+                            className="py-1 px-2 transition-colors w-1/5"
+                            style={{ backgroundColor: getMacroCellColor(entry.calories, macroTargets.calories, false) }}
+                          >
+                            {entry.calories}
+                          </td>
+                          <td 
+                            className="py-1 px-2 transition-colors w-1/5"
+                            style={{ backgroundColor: getMacroCellColor(entry.protein, macroTargets.protein, true) }}
+                          >
+                            {entry.protein}
+                          </td>
+                          <td 
+                            className="py-1 px-2 transition-colors w-1/5"
+                            style={{ backgroundColor: getMacroCellColor(entry.carbs, macroTargets.carbs, false) }}
+                          >
+                            {entry.carbs}
+                          </td>
+                          <td 
+                            className="py-1 px-2 transition-colors w-1/5"
+                            style={{ backgroundColor: getMacroCellColor(entry.fat, macroTargets.fat, false) }}
+                          >
+                            {entry.fat}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
